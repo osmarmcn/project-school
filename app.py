@@ -43,7 +43,7 @@ class App:
         self.label_curso = Label(self.janela, text='curso', font='tahoma 14 bold', fg='red')
         self.label_curso.grid(row=3, column=0)
 
-        self.combo_curso = ttk.Combobox(self.janela, font='tahoma 14 bold', values=['Java', 'Python','Javascript', 'Node'], width=21, state='readonly')
+        self.combo_curso = ttk.Combobox(self.janela, font='tahoma 14 bold', values=['Java', 'Python','Javascript', 'Node'], width=26, state='readonly')
         self.combo_curso.grid(row=3,column=1)
 
         # nota
@@ -60,10 +60,10 @@ class App:
         self.btn_adicionar = Button(self.janela, text='Adicionar', font='tahoma 14 bold' , width=7, fg='red', command=self.addAluno)
         self.btn_adicionar.grid(row=5, column=0, padx=20, pady=25)
 
-        self.btn_editar = Button(self.janela, text='editar', font='tahoma 14 bold' , width=7, fg='red')
+        self.btn_editar = Button(self.janela, text='editar', font='tahoma 14 bold' , width=7, fg='red', command=self.editarAluno)
         self.btn_editar.grid(row=5, column=1,padx=20, pady=25)
 
-        self.btn_excluir = Button(self.janela, text='excluir', font='tahoma 14 bold' , width=7, fg='red')
+        self.btn_excluir = Button(self.janela, text='excluir', font='tahoma 14 bold' , width=7, fg='red', command=self.excluirAluno)
         self.btn_excluir.grid(row=5, column=2,padx=20, pady=25)
 
 
@@ -77,8 +77,14 @@ class App:
         for coluna in self.colunas:
             self.tabela.heading(coluna, text=coluna)
             self.tabela.column(coluna, width=110)
-        self.tabela.pack()
 
+
+        
+
+
+        #bind
+        self.tabela.bind('<ButtonRelease-1>', self.selecionarAluno)
+        self.tabela.pack()
 
 
 
@@ -106,7 +112,21 @@ class App:
         self.text_nota.delete(0, END)
 
 
-        pass
+    def selecionarAluno(self, event):
+        linha_selecionada = self.tabela.selection()[0]
+        item = self.tabela.item(linha_selecionada)['values']
+        self.limparCampos()
+
+        #inserir valores
+        self.text_matricula.config(state=NORMAL)
+        self.text_matricula.insert(0, item[0])
+        self.text_matricula.config(state=DISABLED)
+        self.text_nome.insert(0, item[1])
+        self.text_idade.insert(0, item[2])
+        self.combo_curso.set(item[3])
+        self.text_nota.insert(0, item[4])
+        
+        
     
     def criarAlunos(self):
         nome = self.text_nome.get()
@@ -125,6 +145,23 @@ class App:
         messagebox.showinfo('Sucesso, aluno cadastrado!')
         
         print(self.escola.alunos)
+
+    def editarAluno(self):
+        aluno = self.criarAlunos()
+        aluno.matricula = self.text_matricula.get()
+        self.escola.editarAluno(aluno)
+        self.limparCampos()
+        self.atualizarTabela()
+        messagebox.showinfo('Sucesso, dados alterados!')
+
+
+    def excluirAluno(self):
+        matricula = self.text_matricula.get()
+        self.escola.deletarAluno(matricula)
+        self.limparCampos()
+        self.atualizarTabela()
+        messagebox.showinfo('Sucesso, aluno excluido!')
+        pass
         
 
 
